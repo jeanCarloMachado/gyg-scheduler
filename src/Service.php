@@ -33,54 +33,30 @@ function scheduler($activitiesGetter, int $cityId, DateTime $from, DateTime $to,
     return $result;
 }
 
+function maximizedSchedule($possibleActivities) {
 
-function concreteGetter() {
+    while ($possibleActivities) {
+        //find earliest ending activity
+        $earliest = array_reduce(\f\tail($possibleActivities), function($carry, $val) {
+            if (endsEarlier($carry, $val)->isLeft()) {
+                return $carry;
+            }
+            return $val;
 
-    $data = [
-        [
-            'id' => 666,
-            'startTime' => '2017-11-18 14:00:00',
-            'endTime' => '2017-11-18 14:30:00',
-            'price' => 100,
-            'rating' => 5,
-            'reviewsCount' => 20,
-        ],
-        [
-            'id' => 555,
-            'startTime' => '2017-11-18 15:00:00',
-            'endTime' => '2017-11-18 16:00:00',
-            'price' => 100,
-            'rating' => 2.5,
-            'reviewsCount' => 1,
-        ],
-        [
-            'id' => 333,
-            'startTime' => '2017-11-18 17:00:00',
-            'endTime' => '2017-11-18 18:00:00',
-            'price' => 100,
-            'rating' => 2.5,
-            'reviewsCount' => 40,
-        ],
-        [
-            'id' => 222,
-            'startTime' => '2017-11-18 19:00:00',
-            'endTime' => '2017-11-18 21:00:00',
-            'price' => 100,
-            'rating' => 5,
-            'reviewsCount' => 1,
-        ],
-        [
-            'id' => 111,
-            'startTime' => '2017-11-18 19:00:00',
-            'endTime' => '2017-11-18 21:00:00',
-            'price' => 100,
-            'rating' => 5,
-            'reviewsCount' => 1000,
-        ],
+        }, \f\head($possibleActivities));
 
-    ];
+        //remove conflicting
+        $possibleActivities = array_filter(
+            $possibleActivities,
+            function ($entry) use ($earliest) {
+                return !conflict($entry, $earliest);
+            }
+        );
 
-    return activitiesFactory($data);
+        $result [] = $earliest;
+    }
+
+    return $result;
 }
 
 
@@ -114,36 +90,25 @@ function removeOverspent($budget, Activity ...$activities) {
 }
 
 
-function score($activity) {
-    return $activity->rating * $activity->reviewsCount;
+
+function concreteGetter($cityId, $from, $to) {
+
+   $opts = [
+        'http' => [
+            'method' => 'GET',
+            'header' => [
+                'Content-type: application/json',
+            ],
+        ],
+    ];
+    $context = stream_context_create($opts);
+    $parameters = sprintf("?cityId=%s&from=%s&to=%s", $cityId, $from->format('Y-m-d'), $to->format('Y-m-d'));
+    $entities = file_get_contents('http://localhost:8000/remoteServerMock.php'.$parameters, false, $context);
+    $entities = json_decode($entities, true);
+    //here is good to do a transparent pagination with generators if there are too many results
+    return activitiesFactory($entities);
 }
 
-
-function maximizedSchedule($possibleActivities) {
-
-    while ($possibleActivities) {
-        //find earliest ending activity
-        $earliest = array_reduce(\f\tail($possibleActivities), function($carry, $val) {
-            if (endsEarlier($carry, $val)->isLeft()) {
-                return $carry;
-            }
-            return $val;
-
-        }, \f\head($possibleActivities));
-
-        //remove conflicting
-        $possibleActivities = array_filter(
-            $possibleActivities,
-            function ($entry) use ($earliest) {
-                return !conflict($entry, $earliest);
-            }
-        );
-
-        $result [] = $earliest;
-    }
-
-    return $result;
-}
 
 function endsEarlier(Activity $a, Activity $b) : Either
 {
@@ -155,6 +120,11 @@ function endsEarlier(Activity $a, Activity $b) : Either
     }
 
     return Either::right($b);
+}
+
+
+function score($activity) {
+    return $activity->rating * $activity->reviewsCount;
 }
 
 
