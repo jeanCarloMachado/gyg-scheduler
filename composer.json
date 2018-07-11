@@ -8,7 +8,6 @@
             "GYG\\": "src"
         },
         "files": [
-            "src/Entities.php",
             "src/Service.php"
         ]
     },

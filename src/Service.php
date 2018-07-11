@@ -4,6 +4,20 @@ namespace GYG;
 
 use DateTime;
 
+
+class Activity
+{
+    public $id;
+    public $duration;
+    public $cost;
+    public $reviewsCount;
+    public $rating;
+    public $availability;
+
+}
+
+
+
 function activityFactory(array $data) : Activity
 {
     $activity = new Activity;
