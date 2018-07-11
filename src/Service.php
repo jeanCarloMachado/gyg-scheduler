@@ -39,17 +39,15 @@ function activitiesFactory($data) : array
 function scheduler($activitiesGetter, $city, $from, $to, $budget) : array
 {
     $possibleActivities = $activitiesGetter($city, $from, $to);
-
     $remainingBudget = $budget;
-    $result = [];
 
-    foreach($possibleActivities as $activity) {
+    return array_filter($possibleActivities, function ($activity) use (&$remainingBudget) {
         if ($activity->price < $remainingBudget) {
-            $result[] = $activity;
             $remainingBudget -= $activity->price;
+
+            return true;
         }
-    }
-
-    return $result;
+        
+        return false;
+    });
 }
-
