@@ -19,33 +19,11 @@ class Activity
 }
 
 
-function activityFactory(array $data) : Activity
-{
-    $activity = new Activity;
-    $activity->id = $data['id'];
-    $activity->price = $data['price'];
-    $activity->startTime = new DateTime($data['startTime']);
-    $activity->endTime = new DateTime($data['endTime']);
-    $activity->rating = $data['rating'] ?? 0;
-    $activity->reviewsCount = $data['reviewsCount'] ?? 0;
-    return $activity;
-}
-
-function activitiesFactory($data) : array
-{
-    return array_map(
-        function ($entry) {
-            return activityFactory($entry);
-        },
-        $data
-    );
-}
-
 //activities getter assumes that the data is filtered by city and date
 //which are the constraints that cannot be changed, the rest the script deals with
-function scheduler($activitiesGetter, $city, $from, $to, $budget) : array
+function scheduler($activitiesGetter, int $cityId, DateTime $from, DateTime $to, float $budget) : array
 {
-    $possibleActivities = $activitiesGetter($city, $from, $to);
+    $possibleActivities = $activitiesGetter($cityId, $from, $to);
 
     $result = maximizedSchedule($possibleActivities);
 
@@ -53,6 +31,56 @@ function scheduler($activitiesGetter, $city, $from, $to, $budget) : array
 
 
     return $result;
+}
+
+
+function concreteGetter() {
+
+    $data = [
+        [
+            'id' => 666,
+            'startTime' => '2017-11-18 14:00:00',
+            'endTime' => '2017-11-18 14:30:00',
+            'price' => 100,
+            'rating' => 5,
+            'reviewsCount' => 20,
+        ],
+        [
+            'id' => 555,
+            'startTime' => '2017-11-18 15:00:00',
+            'endTime' => '2017-11-18 16:00:00',
+            'price' => 100,
+            'rating' => 2.5,
+            'reviewsCount' => 1,
+        ],
+        [
+            'id' => 333,
+            'startTime' => '2017-11-18 17:00:00',
+            'endTime' => '2017-11-18 18:00:00',
+            'price' => 100,
+            'rating' => 2.5,
+            'reviewsCount' => 40,
+        ],
+        [
+            'id' => 222,
+            'startTime' => '2017-11-18 19:00:00',
+            'endTime' => '2017-11-18 21:00:00',
+            'price' => 100,
+            'rating' => 5,
+            'reviewsCount' => 1,
+        ],
+        [
+            'id' => 111,
+            'startTime' => '2017-11-18 19:00:00',
+            'endTime' => '2017-11-18 21:00:00',
+            'price' => 100,
+            'rating' => 5,
+            'reviewsCount' => 1000,
+        ],
+
+    ];
+
+    return activitiesFactory($data);
 }
 
 
@@ -145,3 +173,24 @@ function conflict(Activity $a, Activity $b) : bool
 }
 
 
+function activityFactory(array $data) : Activity
+{
+    $activity = new Activity;
+    $activity->id = $data['id'];
+    $activity->price = $data['price'];
+    $activity->startTime = new DateTime($data['startTime']);
+    $activity->endTime = new DateTime($data['endTime']);
+    $activity->rating = $data['rating'] ?? 0;
+    $activity->reviewsCount = $data['reviewsCount'] ?? 0;
+    return $activity;
+}
+
+function activitiesFactory($data) : array
+{
+    return array_map(
+        function ($entry) {
+            return activityFactory($entry);
+        },
+        $data
+    );
+}
