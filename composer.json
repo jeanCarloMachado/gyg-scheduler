@@ -1,0 +1,22 @@
+{
+    "require-dev": {
+        "phpunit/phpunit": "^7"
+    },
+
+    "autoload": {
+        "psr-4": {
+            "GYG\\": "src"
+        },
+        "files": [
+            "src/Entities.php",
+            "src/Service.php"
+        ]
+    },
+
+
+    "autoload-dev": {
+        "psr-4": {
+            "GYGTest\\": "test"
+        }
+    }
+}
