@@ -49,14 +49,14 @@ function scheduler($activitiesGetter, $city, $from, $to, $budget) : array
 
     $result = maximizedSchedule($possibleActivities);
 
-    $result = removeOverspent($result, $budget);
+    $result = removeOverspent($budget, ...$result);
 
 
     return $result;
 }
 
 
-function removeOverspent($activities, $budget) {
+function removeOverspent($budget, Activity ...$activities) {
 
     $totalPrice = array_reduce($activities, function($carry, $entry) {
         return $carry + $entry->price; 
@@ -82,7 +82,7 @@ function removeOverspent($activities, $budget) {
         }
     );
 
-    return removeOverspent($withoutLowestScore, $budget);
+    return removeOverspent($budget, ...$withoutLowestScore);
 }
 
 
