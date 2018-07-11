@@ -10,28 +10,24 @@ use DateTime;
  */
 class FirstTest extends \PHPUnit\Framework\TestCase
 {
-    public function testPickActivitiesUntilEndOfMoney()
+    // when we have  fewer activities than money use all of them
+    public function testScenario1()
     {
         $data = [
             [
                 'id' => 1,
                 'availability' => '2017-11-18 14:00:00',
-                'price' => '50',
+                'duration' => 30,
+                'price' => 50,
                 'city' => 10
             ],
             [
                 'id' => 2,
                 'availability' => '2017-11-19 14:00:00',
-                'price' => '100',
+                'duration' => 60,
+                'price' => 100,
                 'city' => 10
             ],
-            [
-                'id' => 3,
-                'availability' => '2017-11-20 14:00:00',
-                'price' => '150',
-                'city' => 10
-            ],
-
         ];
 
         $activities = activitiesFactory($data);
@@ -39,14 +35,28 @@ class FirstTest extends \PHPUnit\Framework\TestCase
             return $activities;
         };
 
-        $from = new DateTime('2017-11-18 00:00:00');
-        $to = new DateTime('2017-11-19 23:00:00');
-        $city = 10;
-        $budget = 200;
+        $result = scheduler(
+            $activitiesGetter,
+            $cityId = 10,
+            $from = new DateTime('2017-11-18 00:00:00'),
+            $to = new DateTime('2017-11-19 23:00:00'),
+            $budget = 200
+        );
 
-        $result = scheduler($activitiesGetter, $city, $from, $to, $budget);
+        $this->assertEquals(
+            [1,2],
+            $this->getIds($result)
+        );
+    }
 
-        $this->assertCount(2, $result);
+    private function getIds($activities)
+    {
+        return array_map(
+                function ($entry) {
+                    return $entry->id;
+                },
+                $activities
+        );
     }
 }
 

@@ -8,7 +8,9 @@ use DateTime;
 class Activity
 {
     public $id;
-    public $duration;
+
+    public $durationInMinutes;
+
     public $cost;
     public $reviewsCount;
     public $rating;
@@ -36,6 +38,8 @@ function activitiesFactory($data) : array
     );
 }
 
+//activities getter assumes that the data is filtered by city and date
+//which are the constraints that cannot be changed, the rest the script deals with
 function scheduler($activitiesGetter, $city, $from, $to, $budget) : array
 {
     $possibleActivities = $activitiesGetter($city, $from, $to);
