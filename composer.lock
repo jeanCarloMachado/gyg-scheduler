@@ -12,12 +12,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/jeanCarloMachado/f.git",
-                "reference": "beeb2aa5c7d101c8bee3414efff4c2f3b3fa3459"
+                "reference": "03abbe30a6ce4e35b5b9892af6b31504fba75984"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jeanCarloMachado/f/zipball/beeb2aa5c7d101c8bee3414efff4c2f3b3fa3459",
-                "reference": "beeb2aa5c7d101c8bee3414efff4c2f3b3fa3459",
+                "url": "https://api.github.com/repos/jeanCarloMachado/f/zipball/03abbe30a6ce4e35b5b9892af6b31504fba75984",
+                "reference": "03abbe30a6ce4e35b5b9892af6b31504fba75984",
                 "shasum": ""
             },
             "require-dev": {
@@ -35,7 +35,7 @@
                 ]
             },
             "notification-url": "https://packagist.org/downloads/",
-            "time": "2018-06-13T08:42:31+00:00"
+            "time": "2018-07-11T19:33:11+00:00"
         }
     ],
     "packages-dev": [
