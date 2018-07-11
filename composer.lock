@@ -4,8 +4,40 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "638aeb3ef3eb7f7fba2f1c1820780286",
-    "packages": [],
+    "content-hash": "65b6ce6c8edf7d97b9a84382dbd4ac58",
+    "packages": [
+        {
+            "name": "jean-carlo-machado/f",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/jeanCarloMachado/f.git",
+                "reference": "beeb2aa5c7d101c8bee3414efff4c2f3b3fa3459"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/jeanCarloMachado/f/zipball/beeb2aa5c7d101c8bee3414efff4c2f3b3fa3459",
+                "reference": "beeb2aa5c7d101c8bee3414efff4c2f3b3fa3459",
+                "shasum": ""
+            },
+            "require-dev": {
+                "phpunit/phpunit": "~6"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "f\\": "src"
+                },
+                "files": [
+                    "src/f.php",
+                    "src/tree.php",
+                    "src/generic_operations.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "time": "2018-06-13T08:42:31+00:00"
+        }
+    ],
     "packages-dev": [
         {
             "name": "doctrine/instantiator",
@@ -1415,7 +1447,9 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {
+        "jean-carlo-machado/f": 20
+    },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": [],

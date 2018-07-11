@@ -18,5 +18,8 @@
         "psr-4": {
             "GYGTest\\": "test"
         }
+    },
+    "require": {
+        "jean-carlo-machado/f": "dev-master"
     }
 }
