@@ -15,6 +15,7 @@ class Activity
     public $reviewsCount;
     public $rating;
     public $availability;
+    public $price;
 }
 
 
@@ -25,6 +26,8 @@ function activityFactory(array $data) : Activity
     $activity->price = $data['price'];
     $activity->startTime = new DateTime($data['startTime']);
     $activity->endTime = new DateTime($data['endTime']);
+    $activity->rating = $data['rating'] ?? 0;
+    $activity->reviewsCount = $data['reviewsCount'] ?? 0;
     return $activity;
 }
 
@@ -43,6 +46,52 @@ function activitiesFactory($data) : array
 function scheduler($activitiesGetter, $city, $from, $to, $budget) : array
 {
     $possibleActivities = $activitiesGetter($city, $from, $to);
+
+    $result = maximizedSchedule($possibleActivities);
+
+    $result = removeOverspent($result, $budget);
+
+
+    return $result;
+}
+
+
+function removeOverspent($activities, $budget) {
+
+    $totalPrice = array_reduce($activities, function($carry, $entry) {
+        return $carry + $entry->price; 
+    }, 0);
+
+    if ($totalPrice <= $budget) {
+        return $activities;
+    }
+
+
+    $lowestScore = array_reduce(\f\tail($activities), function($carry, $val) {
+        if (score($carry) < score($val))
+            return $carry;
+
+        return $val;
+    }, \f\head($activities));
+
+
+    $withoutLowestScore = array_filter(
+        $activities,
+        function ($entry) use ($lowestScore) {
+            return $entry != $lowestScore;
+        }
+    );
+
+    return removeOverspent($withoutLowestScore, $budget);
+}
+
+
+function score($activity) {
+    return $activity->rating * $activity->reviewsCount;
+}
+
+
+function maximizedSchedule($possibleActivities) {
 
     while ($possibleActivities) {
         //find earliest ending activity
@@ -64,15 +113,6 @@ function scheduler($activitiesGetter, $city, $from, $to, $budget) : array
 
         $result [] = $earliest;
     }
-
-    /* $remainingBudget = $budget; */
-    /* $result = []; */
-    /* foreach($possibleActivities as $activity) { */
-    /*     if ($activity->price < $remainingBudget) { */
-    /*         $result[] = $activity; */
-    /*         $remainingBudget -= $activity->price; */
-    /*     } */
-    /* } */
 
     return $result;
 }

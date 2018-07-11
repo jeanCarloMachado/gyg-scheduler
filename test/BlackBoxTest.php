@@ -19,19 +19,17 @@ class BlackBoxTest extends \PHPUnit\Framework\TestCase
                     'id' => 1,
                     'startTime' => '2017-11-18 14:00:00',
                     'endTime' => '2017-11-18 14:30:00',
-                    'price' => 50,
-                    'city' => 10
+                    'price' => 50
                 ],
                 [
                     'id' => 2,
                     'startTime' => '2017-11-19 14:00:00',
                     'endTime' => '2017-11-19 15:00:00',
-                    'price' => 100,
-                    'city' => 10
+                    'price' => 50
                 ],
             ];
 
-            return activitiesFactory($data);
+            return $this->factoryActivitiesForTest($data);
         };
 
         $result = scheduler(
@@ -42,9 +40,9 @@ class BlackBoxTest extends \PHPUnit\Framework\TestCase
             $budget = 200
         );
 
-        $this->assertEquals(
+        $this->assertSameIds(
             [1,2],
-            $this->getIds($result)
+            $result
         );
     }
 
@@ -58,18 +56,14 @@ class BlackBoxTest extends \PHPUnit\Framework\TestCase
                     'id' => 666,
                     'startTime' => '2017-11-18 14:00:00',
                     'endTime' => '2017-11-18 14:30:00',
-                    'price' => 50,
-                    'city' => 10
                 ],
                 [
                     'id' => 555,
                     'startTime' => '2017-11-18 14:00:00',
                     'endTime' => '2017-11-18 15:00:00',
-                    'price' => 100,
-                    'city' => 10
                 ],
             ];
-            return activitiesFactory($data);
+            return $this->factoryActivitiesForTest($data);
         };
 
         $result = scheduler(
@@ -80,13 +74,15 @@ class BlackBoxTest extends \PHPUnit\Framework\TestCase
             $budget = 200
         );
 
-        $this->assertEquals(
+        $this->assertSameIds(
             [666],
-            $this->getIds($result)
+            $result
         );
     }
 
-    public function testLotsOfData()
+    // when the schedule proposed is bigger than the money,
+    // remove the lowest ranking activity recursively
+    public function testScenario3()
     {
 
         $activitiesGetter = function() {
@@ -95,25 +91,37 @@ class BlackBoxTest extends \PHPUnit\Framework\TestCase
                     'id' => 666,
                     'startTime' => '2017-11-18 14:00:00',
                     'endTime' => '2017-11-18 14:30:00',
-                    'price' => 50,
-                    'city' => 10
+                    'price' => 100,
+                    'rating' => 5,
+                    'reviewsCount' => 20,
                 ],
                 [
                     'id' => 555,
-                    'startTime' => '2017-11-18 14:00:00',
-                    'endTime' => '2017-11-18 15:00:00',
+                    'startTime' => '2017-11-18 15:00:00',
+                    'endTime' => '2017-11-18 16:00:00',
                     'price' => 100,
-                    'city' => 10
+                    'rating' => 2.5,
+                    'reviewsCount' => 1,
                 ],
                 [
                     'id' => 333,
-                    'startTime' => '2017-11-18 16:00:00',
-                    'endTime' => '2017-11-18 17:00:00',
+                    'startTime' => '2017-11-18 17:00:00',
+                    'endTime' => '2017-11-18 18:00:00',
                     'price' => 100,
-                    'city' => 10
+                    'rating' => 2.5,
+                    'reviewsCount' => 40,
                 ],
+                [
+                    'id' => 222,
+                    'startTime' => '2017-11-18 19:00:00',
+                    'endTime' => '2017-11-18 21:00:00',
+                    'price' => 100,
+                    'rating' => 5,
+                    'reviewsCount' => 1,
+                ],
+
             ];
-            return activitiesFactory($data);
+            return $this->factoryActivitiesForTest($data);
         };
 
         $result = scheduler(
@@ -124,21 +132,32 @@ class BlackBoxTest extends \PHPUnit\Framework\TestCase
             $budget = 200
         );
 
-        $this->assertEquals(
+        $this->assertSameIds(
             [666, 333],
-            $this->getIds($result)
+            $result
         );
     }
 
 
-    private function getIds($activities)
+    private function assertSameIds($givenIds, $result)
     {
-        return array_map(
-                function ($entry) {
-                    return $entry->id;
-                },
-                $activities
+        $ids = array_map(
+            function ($entry) {
+                return $entry->id;
+            },
+            $result
         );
+
+        return $this->assertTrue(!array_diff($givenIds, $ids));
+    }
+
+    private function factoryActivitiesForTest($activities)
+    {
+        foreach($activities as $key => $activity) {
+            $activities[$key]['price'] = $activity['price'] ?? 50;
+
+        }
+        return activitiesFactory($activities);
     }
 }
 
